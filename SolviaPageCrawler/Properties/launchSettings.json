@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SolviaPageCrawler": {
+      "commandName": "Project",
+      "commandLineArgs": "https://www.solvia.ch"
+    }
+  }
+}

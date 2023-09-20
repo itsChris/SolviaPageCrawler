@@ -9,14 +9,21 @@ namespace BrokenLinkChecker
 {
     class Program
     {
-        private const string RootUrl = "https://www.effrx.com";
+        private static string RootUrl = "";
         private static readonly HashSet<string> VisitedUrls = new HashSet<string>();
         private static readonly List<string> ExternalUrls = new List<string>();
         private static readonly List<string> SpecialUrls = new List<string>();
         private static readonly List<(string BrokenLink, string Referrer)> BrokenUrls = new List<(string, string)>();
+        private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(5);
+
 
         static async Task Main(string[] args)
         {
+            if (args.Length == 0) {
+                await Console.Out.WriteLineAsync("Please provide a valid URL as command line argument (i.e. https://www.solvia.ch)");
+                return;
+            }
+            RootUrl = args[0];
             await CheckUrlForLinks(RootUrl);
 
             Console.WriteLine("\nExternal Links Found:");
