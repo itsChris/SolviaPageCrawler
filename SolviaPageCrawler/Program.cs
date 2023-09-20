@@ -53,6 +53,31 @@ namespace BrokenLinkChecker
             Console.WriteLine("\nFinished checking.");
         }
 
+        private static HttpClient CreateHttpClient()
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+                {
+                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                    {
+                        return true; // Valid certificate, no error.
+                    }
+
+                    // Print a red warning for an invalid certificate but proceed.
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Warning: SSL certificate error encountered for {certificate.Subject}: {sslPolicyErrors}");
+                    Console.ResetColor();
+
+                    return true; // Proceed even though there's an error.
+                }
+            };
+
+            return new HttpClient(handler);
+        }
+
+
+
         private static async Task CheckUrlForLinks(string url, string referrer = null)
         {
             if (VisitedUrls.Contains(url))
@@ -61,7 +86,7 @@ namespace BrokenLinkChecker
             VisitedUrls.Add(url);
             Console.WriteLine($"Checking URL: {url}");
 
-            using var client = new HttpClient();
+            using var client = CreateHttpClient();
 
             try
             {
