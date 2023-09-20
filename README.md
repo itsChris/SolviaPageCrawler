@@ -27,7 +27,6 @@ This project provides a tool to recursively crawl a website and check for broken
 
 ## Important Notes
 
-- **Rate Limits:** This tool uses concurrent tasks to speed up the link checking process. Ensure you do not overwhelm servers or get blocked by making too many requests in a short span of time.
 - **SSL Warnings:** If the tool encounters an invalid SSL certificate, it will log a red warning in the console but will continue execution.
 
 ## Contribute
