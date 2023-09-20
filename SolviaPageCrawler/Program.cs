@@ -14,7 +14,6 @@ namespace BrokenLinkChecker
         private static readonly List<string> ExternalUrls = new List<string>();
         private static readonly List<string> SpecialUrls = new List<string>();
         private static readonly List<(string BrokenLink, string Referrer)> BrokenUrls = new List<(string, string)>();
-        private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(5);
 
 
         static async Task Main(string[] args)
