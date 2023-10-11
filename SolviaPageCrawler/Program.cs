@@ -14,6 +14,7 @@ namespace BrokenLinkChecker
         private static readonly List<string> ExternalUrls = new List<string>();
         private static readonly List<string> SpecialUrls = new List<string>();
         private static readonly List<(string BrokenLink, string Referrer)> BrokenUrls = new List<(string, string)>();
+        private static readonly List<string> DownloadedGraphics = new List<string>();
 
 
         static async Task Main(string[] args)
@@ -75,7 +76,23 @@ namespace BrokenLinkChecker
             return new HttpClient(handler);
         }
 
+        private static async Task DownloadGraphic(string graphicUrl)
+        {
+            using var client = CreateHttpClient();
 
+            var bytes = await client.GetByteArrayAsync(graphicUrl);
+            var filename = System.IO.Path.GetFileName(graphicUrl);
+            var path = System.IO.Path.Combine("DownloadedGraphics", filename); // Save graphics to "DownloadedGraphics" folder.
+
+            if (!System.IO.Directory.Exists("DownloadedGraphics"))
+            {
+                System.IO.Directory.CreateDirectory("DownloadedGraphics");
+            }
+
+            await System.IO.File.WriteAllBytesAsync(path, bytes);
+            DownloadedGraphics.Add(path);
+            Console.WriteLine($"Downloaded graphic: {graphicUrl} -> {path}");
+        }
 
         private static async Task CheckUrlForLinks(string url, string referrer = null)
         {
@@ -124,6 +141,25 @@ namespace BrokenLinkChecker
                     else if (!ExternalUrls.Contains(absoluteUrl))
                     {
                         ExternalUrls.Add(absoluteUrl);
+                    }
+                }
+
+                // Check for graphic elements
+                var imgNodes = doc.DocumentNode.SelectNodes("//img[@src]");
+                if (imgNodes != null)
+                {
+                    foreach (var imgNode in imgNodes)
+                    {
+                        var srcValue = imgNode.GetAttributeValue("src", null);
+                        if (!string.IsNullOrEmpty(srcValue))
+                        {
+                            var graphicUrl = new Uri(new Uri(url), srcValue).AbsoluteUri;
+                            var extension = System.IO.Path.GetExtension(graphicUrl).ToLower();
+                            if (extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".svg")
+                            {
+                                await DownloadGraphic(graphicUrl);
+                            }
+                        }
                     }
                 }
             }

@@ -2,7 +2,7 @@
   "profiles": {
     "SolviaPageCrawler": {
       "commandName": "Project",
-      "commandLineArgs": "https://www.solvia.ch"
+      "commandLineArgs": "https://www.gustavkaeser.com"
     }
   }
 }
